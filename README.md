@@ -63,7 +63,7 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 
 ## 🛠️ Building
 
-### 🔧 PCB-Plate
+### 🔧 PCB
 ![ESP-HACK_PCB](Pictures/PCB.png)
 
 
@@ -172,7 +172,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 ## 🛠️ Сборка
 
-### 🔧 PCB-Плата
+### 🔧 PCB
 ![ESP-HACK_PCB](Pictures/PCB.png)
 
 
