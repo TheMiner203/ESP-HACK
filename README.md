@@ -23,7 +23,7 @@ You must comply with the laws of your country. The author is not responsible for
 ### ⚡ Features
 
 **WiFi**
-- ~~Deauther~~ *(80 pckts/sec)*  
+- Deauther *(works, but poorly)*  
 - Beacon Spam  
 - EvilPortal  
 - Wardriving
@@ -34,7 +34,7 @@ You must comply with the laws of your country. The author is not responsible for
 
 **SubGHz**
 - SubRead  
-- ~~SubSend~~ *(in development)*  
+- ~~SubSend~~ *(problems due to IDE)*  
 - Analyzer  
 - Jammer
 
@@ -130,7 +130,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 ### ⚡ Возможности
 
 **WiFi**
-- ~~Deauther~~ *(80 pckts/sec)*  
+- Deauther *(работает, но плохо)*  
 - Beacon Spam  
 - EvilPortal  
 - Wardriving
@@ -141,7 +141,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 **SubGHz**
 - SubRead  
-- ~~SubSend~~ *(в разработке)*  
+- ~~SubSend~~ *(Проблемы из-за IDE)*  
 - Analyzer  
 - Jammer
 
