@@ -1,12 +1,12 @@
 <div align="left">
   <h1>📡 ESP-HACK FW V1.0   <a href="#en">English</a> | <a href="#ru">Русский</a></h1>
 
-  ![ESP-HACK_LOGO](assets/logo.png)
+  ![ESP-HACK_LOGO](Pictures/ESP-HACK.png)
 </div>
 
 <div id="en">
 
-## 🚀 About ESP-HACK FW V1.0
+## 🚀 About ESP-HACK FW
 ESP-HACK is a powerful universal firmware for the ESP32, built for RF research and pentesting of radio frequencies, Bluetooth, infrared devices and GPIO integrations.  
 The project targets enthusiasts and pentesters who want to explore protocols and devices in Sub-GHz ranges and other wireless technologies.
 
@@ -113,7 +113,7 @@ Telegram: `@ESPH4CK`
 
 <div id="ru" hidden>
 
-## 🚀 О проекте ESP-HACK FW V1.0
+## 🚀 О проекте ESP-HACK FW
 ESP-HACK — мощная универсальная прошивка для ESP32, собранная для исследований и пентестинга радиочастот, Bluetooth, инфракрасных устройств и GPIO-интеграций.  
 Проект ориентирован на энтузиастов и пентестеров, желающих исследовать протоколы и устройства в суб-гигагерцовых диапазонах и в беспроводных технологиях.
 
