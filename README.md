@@ -63,6 +63,10 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 
 ## 🛠️ Building
 
+### 🔧 PCB-Plate
+![ESP-HACK_Device](Pictures/Plate.jpg)
+
+
 ### 🔧 Required components
 | Component | Link |
 |-----------|--------|
@@ -99,9 +103,7 @@ During operation ESP-HACK may show the following errors:
 ---
 
 ## 📸 Final result
-[![Watch the video](assets/preview.jpg)](assets/demo.mp4)
-
-> Click the preview
+![ESP-HACK_Device](Pictures/Device.jpg)
 
 ---
 
@@ -170,6 +172,10 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 ## 🛠️ Сборка
 
+### 🔧 PCB-Плата
+![ESP-HACK_Device](Pictures/Plate.jpg)
+
+
 ### 🔧 Необходимые компоненты
 | Компонент | Ссылка |
 |-----------|--------|
@@ -206,9 +212,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 ---
 
 ## 📸 Финальный результат
-[![Watch the video](assets/preview.jpg)](assets/demo.mp4)
-
-> Нажмите на превью
+![ESP-HACK_Device](Pictures/Device.jpg)
 
 ---
 
