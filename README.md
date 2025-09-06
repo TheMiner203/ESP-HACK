@@ -15,8 +15,8 @@ The project targets enthusiasts and pentesters who want to explore protocols and
 ---
 
 ### ⚠️ Disclaimer
-This firmware is developed strictly for research and hardware testing purposes.  
-You must comply with the laws of your country. The author is not responsible for improper / illegal use. Jammers are **ILLEGAL** in most countries.
+This firmware is designed exclusively for research purposes and hardware testing. 
+By using the firmware, you must comply with the laws of your region. The firmware creator is not responsible for your actions. Jammers are ILLEGAL.
 
 ---
 
@@ -122,8 +122,8 @@ ESP-HACK — мощная универсальная прошивка для ESP
 ---
 
 ### ⚠️ Дисклеймер
-Данная прошивка разработана исключительно для исследовательских целей и тестирования оборудования.  
-Вы обязаны соблюдать законодательство вашей страны. Автор не несёт ответственности за неправомерное использование. Глушилки — **НЕЛЕГАЛЬНЫ** в большинстве стран.
+Данная прошивка разработана исключительно для исследовательских целей и тестирования оборудования. 
+Используя прошивку вы обязаны соблюдать законодательство своего региона. Создатель прошивки не несет ответственность за ваши действия. Глушилки — НЕЛЕГАЛЬНЫ.
 
 ---
 
