@@ -64,13 +64,13 @@ You must comply with the laws of your country. The author is not responsible for
 ## 🛠️ Building
 
 ### 🔧 Required components
-| Component | Example |
+| Component | Link |
 |-----------|--------|
-| ESP32-WROOM | [LINK](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
-| CC1101 | [LINK](https://sl.aliexpress.ru/p?key=Ale3VnU) |
-| Display | [LINK](https://sl.aliexpress.ru/p?key=9O83V87) |
-| SD-Card module | [LINK](https://sl.aliexpress.ru/p?key=Px83VhI) |
-| IR-TX and IR-RX | [LINK](https://sl.aliexpress.ru/p?key=nW83Vd3) |
+| ESP32-WROOM | [TAP](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
+| CC1101 | [TAP](https://sl.aliexpress.ru/p?key=Ale3VnU) |
+| Display | [TAP](https://sl.aliexpress.ru/p?key=9O83V87) |
+| SD-Card module | [TAP](https://sl.aliexpress.ru/p?key=Px83VhI) |
+| IR-TX and IR-RX | [TAP](https://sl.aliexpress.ru/p?key=nW83Vd3) |
 
 ---
 
@@ -171,7 +171,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 ## 🛠️ Сборка
 
 ### 🔧 Необходимые компоненты
-| Компонент | Пример |
+| Компонент | Ссылка |
 |-----------|--------|
 | ESP32-WROOM | [ТЫК](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
 | CC1101 | [ТЫК](https://sl.aliexpress.ru/p?key=Ale3VnU) |
