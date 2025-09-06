@@ -65,6 +65,7 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 
 ### 🔧 PCB
 ![ESP-HACK_PCB](Pictures/PCB.png)
+Thanks Dripside!
 
 
 ### 🔧 Required components
@@ -174,6 +175,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 ### 🔧 PCB
 ![ESP-HACK_PCB](Pictures/PCB.png)
+Thanks Dripside!
 
 
 ### 🔧 Необходимые компоненты
