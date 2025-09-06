@@ -69,8 +69,8 @@ You must comply with the laws of your country. The author is not responsible for
 | ESP32-WROOM | [TAP](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
 | CC1101 | [TAP](https://sl.aliexpress.ru/p?key=Ale3VnU) |
 | Display | [TAP](https://sl.aliexpress.ru/p?key=9O83V87) |
-| SD-Card module | [TAP](https://sl.aliexpress.ru/p?key=Px83VhI) |
-| IR-TX and IR-RX | [TAP](https://sl.aliexpress.ru/p?key=nW83Vd3) |
+| SD-Мodule | [TAP](https://sl.aliexpress.ru/p?key=Px83VhI) |
+| IR-TX, IR-RX | [TAP](https://sl.aliexpress.ru/p?key=nW83Vd3) |
 
 ---
 
@@ -176,8 +176,8 @@ ESP-HACK — мощная универсальная прошивка для ESP
 | ESP32-WROOM | [ТЫК](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
 | CC1101 | [ТЫК](https://sl.aliexpress.ru/p?key=Ale3VnU) |
 | Дисплей | [ТЫК](https://sl.aliexpress.ru/p?key=9O83V87) |
-| SD-Card модуль | [ТЫК](https://sl.aliexpress.ru/p?key=Px83VhI) |
-| IR-TX и IR-RX | [ТЫК](https://sl.aliexpress.ru/p?key=nW83Vd3) |
+| SD-Module | [ТЫК](https://sl.aliexpress.ru/p?key=Px83VhI) |
+| IR-TX, IR-RX | [ТЫК](https://sl.aliexpress.ru/p?key=nW83Vd3) |
 
 ---
 
