@@ -82,8 +82,8 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 | **🔘 Buttons** | UP (K1) → G27 | DOWN (K2) → G26 | OK (K3) → G33 | BACK (K4) → G32 | - | - | - |
 | **📡 CC1101** | 1 → GND | 2 → 3V3 | 3 → G34 | 4 → G5 | 5 → G18 | 6 → G23 | 7 → G19 |
 | **📡 IR** | IR-T → G4 | IR-R → G14 | - | - | - | - | - |
-| **🔌 GPIO** | A-G35 | B-G25 | C-G17 | D-G16 | E-G13 | F-G12 | G-G4 |
-| **💾 SD-Card** | MOSI → G15 | CLK → G2 | MISO → G0 | CS → GND | - | - | - |
+| **🔌 GPIO** | A → G35 | B → G25 | C → G17 | D → G16 | E → G13 | F → G12 | G → G4 |
+| **💾 SD-Card** | 3v3 → 3v3 | GND → GND | MOSI → G15 | CLK → G2 | MISO → G0 | CS → GND | - |
 
 ---
 
@@ -189,8 +189,8 @@ ESP-HACK — мощная универсальная прошивка для ESP
 | **🔘 Buttons** | UP (K1) → G27 | DOWN (K2) → G26 | OK (K3) → G33 | BACK (K4) → G32 | - | - | - |
 | **📡 CC1101** | 1 → GND | 2 → 3V3 | 3 → G34 | 4 → G5 | 5 → G18 | 6 → G23 | 7 → G19 |
 | **📡 IR** | IR-T → G4 | IR-R → G14 | - | - | - | - | - |
-| **🔌 GPIO** | A-G35 | B-G25 | C-G17 | D-G16 | E-G13 | F-G12 | G-G4 |
-| **💾 SD-Card** | MOSI → G15 | CLK → G2 | MISO → G0 | CS → GND | - | - | - |
+| **🔌 GPIO** | A → G35 | B → G25 | C → G17 | D → G16 | E → G13 | F → G12 | G → G4 |
+| **💾 SD-Card** | 3v3 → 3v3 | GND → GND | MOSI → G15 | CLK → G2 | MISO → G0 | CS → GND | - |
 
 ---
 
