@@ -1,5 +1,5 @@
 <div align="left">
-  <h1>📡 ESP-HACK FW V1.0   <a href="#en">English</a> | <a href="#ru">Русский</a></h1>
+  <h1>📡 ESP-HACK FW   <a href="#en">English</a> | <a href="#ru">Русский</a></h1>
 
   ![ESP-HACK_LOGO](Pictures/ESP-HACK.png)
 </div>
@@ -20,7 +20,7 @@ You must comply with the laws of your country. The author is not responsible for
 
 ---
 
-### ⚡ Features (FW V1.0)
+### ⚡ Features
 
 **WiFi**
 - ~~Deauther~~ *(80 pckts/sec)*  
@@ -127,7 +127,7 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 ---
 
-### ⚡ Возможности (FW V1.0)
+### ⚡ Возможности
 
 **WiFi**
 - ~~Deauther~~ *(80 pckts/sec)*  
