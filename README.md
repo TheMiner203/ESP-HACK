@@ -46,9 +46,7 @@ IOS, Android, Windows
 
 **GPIO**
 - ~~iButton (without module)~~ *(in development)*  
-- NRF24:
-Jammer (ILLIGAL)
-Config
+- NRF24: Jammer (ILLIGAL), Config
 - ~~Serial~~ *(in development)*
 
 ---
@@ -159,9 +157,7 @@ IOS, Android, Windows
 
 **GPIO**
 - ~~iButton (без модуля)~~ *(в разработке)*  
-- NRF24:
-Jammer (ILLIGAL)
-Config
+- NRF24: Jammer (ILLIGAL), Config
 - ~~Serial~~ *(в разработке)*
 
 ---
