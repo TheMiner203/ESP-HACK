@@ -29,14 +29,15 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 - Wardriving
 
 **Bluetooth**
-- iOS, Android, WIN Spam  
+- BLE-Spam:
+IOS, Android, Windows
 - BadBLE
 
 **SubGHz**
 - SubRead  
 - ~~SubSend~~ *(problems due to IDE)*  
 - Analyzer  
-- Jammer
+- Jammer (ILLIGAL)
 
 **Infrared**
 - IR-Send  
@@ -45,7 +46,9 @@ By using the firmware, you must comply with the laws of your region. The firmwar
 
 **GPIO**
 - ~~iButton (without module)~~ *(in development)*  
-- NRF24  
+- NRF24:
+Jammer (ILLIGAL)
+Config
 - ~~Serial~~ *(in development)*
 
 ---
@@ -139,14 +142,15 @@ ESP-HACK — мощная универсальная прошивка для ESP
 - Wardriving
 
 **Bluetooth**
-- iOS, Android, WIN Spam  
+- BLE-Spam:
+IOS, Android, Windows
 - BadBLE
 
 **SubGHz**
 - SubRead  
 - ~~SubSend~~ *(Проблемы из-за IDE)*  
 - Analyzer  
-- Jammer
+- Jammer (ILLIGAL)
 
 **Infrared**
 - IR-Send  
@@ -155,7 +159,9 @@ ESP-HACK — мощная универсальная прошивка для ESP
 
 **GPIO**
 - ~~iButton (без модуля)~~ *(в разработке)*  
-- NRF24  
+- NRF24:
+Jammer (ILLIGAL)
+Config
 - ~~Serial~~ *(в разработке)*
 
 ---
