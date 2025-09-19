@@ -72,11 +72,11 @@ Thanks Dripside!
 ### 🔧 Required components
 | Component | Link |
 |-----------|--------|
-| ESP32-WROOM | [TAP](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
-| CC1101 | [TAP](https://sl.aliexpress.ru/p?key=Ale3VnU) |
-| Display | [TAP](https://sl.aliexpress.ru/p?key=9O83V87) |
-| SD-Мodule | [TAP](https://sl.aliexpress.ru/p?key=Px83VhI) |
-| IR-TX, IR-RX | [TAP](https://sl.aliexpress.ru/p?key=nW83Vd3) |
+| ESP32-WROOM | [TAP](https://aliexpress.ru/item/1005007817121199.html) |
+| CC1101 | [TAP](https://aliexpress.ru/item/1005008544032996.html) |
+| Display SH1106 | [TAP](https://aliexpress.ru/item/1005004464878029.html) |
+| SD-Мodule | [TAP](https://aliexpress.ru/item/32674518514.html) |
+| IR-TX, IR-RX | [TAP](https://aliexpress.ru/item/1005007446501425.html) |
 
 ---
 
@@ -183,11 +183,11 @@ Thanks Dripside!
 ### 🔧 Необходимые компоненты
 | Компонент | Ссылка |
 |-----------|--------|
-| ESP32-WROOM | [ТЫК](https://sl.aliexpress.ru/p?key=A7e3VOZ) |
-| CC1101 | [ТЫК](https://sl.aliexpress.ru/p?key=Ale3VnU) |
-| Дисплей | [ТЫК](https://sl.aliexpress.ru/p?key=9O83V87) |
-| SD-Module | [ТЫК](https://sl.aliexpress.ru/p?key=Px83VhI) |
-| IR-TX, IR-RX | [ТЫК](https://sl.aliexpress.ru/p?key=nW83Vd3) |
+| ESP32-WROOM | [TAP](https://aliexpress.ru/item/1005007817121199.html) |
+| CC1101 | [TAP](https://aliexpress.ru/item/1005008544032996.html) |
+| Display SH1106 | [TAP](https://aliexpress.ru/item/1005004464878029.html) |
+| SD-Мodule | [TAP](https://aliexpress.ru/item/32674518514.html) |
+| IR-TX, IR-RX | [TAP](https://aliexpress.ru/item/1005007446501425.html) |
 
 ---
 
