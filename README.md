@@ -70,7 +70,7 @@ IOS, Android, Windows
 
 ### 🔧 PCB
 
-![ESP-HACK_PCB](other/Pictures/PCB.png)
+![ESP-HACK_PCB](others/Pictures/PCB.png)
 Thanks Dripside!
 
 ### 🔧 Required components
