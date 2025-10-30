@@ -1,6 +1,6 @@
 # 📡 ESP-HACK FW — [English](./README.md)
 
-![ESP-HACK_LOGO](other/Pictures/ESP-HACK.png)
+![ESP-HACK_LOGO](others/Pictures/ESP-HACK.png)
 
 ## 🚀 О проекте ESP-HACK FW
 
@@ -112,7 +112,7 @@ Thanks Dripside!
 
 ## 📸 Финальный результат
 
-![ESP-HACK_Device](other/Pictures/Device.jpg)
+![ESP-HACK_Device](others/Pictures/Device.jpg)
 
 ---
 
