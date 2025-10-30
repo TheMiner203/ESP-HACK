@@ -1,6 +1,6 @@
 # 📡 ESP-HACK FW — [Русский](./README-ru.md)
 
-![ESP-HACK_LOGO](other/Pictures/ESP-HACK.png)
+![ESP-HACK_LOGO](others/Pictures/ESP-HACK.png)
 
 ## 🚀 About ESP-HACK FW
 
@@ -70,7 +70,7 @@ IOS, Android, Windows
 
 ### 🔧 PCB
 
-![ESP-HACK_PCB](other/Pictures/PCB.png)
+![ESP-HACK_PCB](others/Pictures/PCB.png)
 Thanks Dripside!
 
 ### 🔧 Required components
@@ -112,7 +112,7 @@ During operation ESP-HACK may show the following errors:
 
 ## 📸 Final result
 
-![ESP-HACK_Device](other/Pictures/Device.jpg)
+![ESP-HACK_Device](others/Pictures/Device.jpg)
 
 ---
 
