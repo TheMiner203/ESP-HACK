@@ -112,7 +112,7 @@ During operation ESP-HACK may show the following errors:
 
 ## 📸 Final result
 
-![ESP-HACK_Device](other/Pictures/Device.jpg)
+![ESP-HACK_Device](others/Pictures/Device.jpg)
 
 ---
 
