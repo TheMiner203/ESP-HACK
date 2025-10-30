@@ -1,7 +1,7 @@
 <div align="left">
   <h1>📡 ESP-HACK FW   <a href="#en">English</a> | <a href="#ru">Русский</a></h1>
 
-  ![ESP-HACK_LOGO](Pictures/ESP-HACK.png)
+  ![ESP-HACK_LOGO](other/Pictures/ESP-HACK.png)
 </div>
 
 <div id="en">
@@ -65,7 +65,7 @@ IOS, Android, Windows
 ## 🛠️ Building
 
 ### 🔧 PCB
-![ESP-HACK_PCB](Pictures/PCB.png)
+![ESP-HACK_PCB](other/Pictures/PCB.png)
 Thanks Dripside!
 
 
@@ -105,7 +105,7 @@ During operation ESP-HACK may show the following errors:
 ---
 
 ## 📸 Final result
-![ESP-HACK_Device](Pictures/Device.jpg)
+![ESP-HACK_Device](other/Pictures/Device.jpg)
 
 ---
 
@@ -176,7 +176,7 @@ IOS, Android, Windows
 ## 🛠️ Сборка
 
 ### 🔧 PCB
-![ESP-HACK_PCB](Pictures/PCB.png)
+![ESP-HACK_PCB](other/Pictures/PCB.png)
 Thanks Dripside!
 
 
@@ -216,7 +216,7 @@ Thanks Dripside!
 ---
 
 ## 📸 Финальный результат
-![ESP-HACK_Device](Pictures/Device.jpg)
+![ESP-HACK_Device](other/Pictures/Device.jpg)
 
 ---
 
