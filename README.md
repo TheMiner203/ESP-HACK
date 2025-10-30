@@ -1,6 +1,6 @@
 # 📡 ESP-HACK FW — [Русский](./README-ru.md)
 
-![ESP-HACK_LOGO](other/Pictures/ESP-HACK.png)
+![ESP-HACK_LOGO](others/Pictures/ESP-HACK.png)
 
 ## 🚀 About ESP-HACK FW
 
