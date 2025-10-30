@@ -9,6 +9,11 @@
 #include <RCSwitch.h>
 #include "CONFIG.h"
 
+
+#define SUBGHZ_MENU_ITEM_COUNT 4
+static const char* subghzMenuItems[] = {"SubRead", "SubSend", "Analyzer", "Jammer"};
+
+
 // Shared global variables
 extern Adafruit_SH1106G display;
 extern GButton buttonUp;
@@ -40,5 +45,29 @@ struct tpKeyData {
 
 // Function prototype for SubGHz entry point
 void runSubGHz();
-
+void setupCC1101();
+void configureCC1101();
+void restoreReceiveMode();
+void read_rcswitch(tpKeyData* kd);
+void read_raw(tpKeyData* kd);
+void OLED_printWaitingSignal();
+void OLED_printKey(tpKeyData* kd, String fileName = "", bool isSending = false);
+void OLED_printError(String st, bool err = true);
+bool saveKeyToSD(tpKeyData* kd);
+bool loadKeyFromSD(String fileName, tpKeyData* kd);
+void sendSynthKey(tpKeyData* kd);
+void RCSwitch_send(uint64_t data, unsigned int bits, int pulse, int protocol, int repeat);
+void RCSwitch_RAW_send(int *ptrtransmittimings);
+void myDelayMcs(unsigned long dl);
+void OLED_printAnalyzer(bool signalReceived = false, float detectedFreq = 0.0);
+void OLED_printJammer();
+void OLED_printFileExplorer();
+void OLED_printDeleteConfirm();
+void startJamming();
+void stopJamming();
+String getTypeName(emKeys tp);
+void loadFileList();
+bool initRfModule(String mode, float freq);
+void deinitRfModule();
+void OLED_printSubGHzMenu(Adafruit_SH1106G &display, byte menuIndex);
 #endif

@@ -1,10 +1,12 @@
-#include "gpio_menu.h"
+#include <Arduino.h>
+#include "gpio.h"
 #include "CONFIG.h"
 #include <Adafruit_SH110X.h>
 #include <GyverButton.h>
 #include <SPI.h>
 #include <RF24.h>
 #include <SD.h>
+#include "display.h"
 
 extern Adafruit_SH1106G display;
 extern GButton buttonUp, buttonDown, buttonOK, buttonBack;
@@ -38,6 +40,34 @@ byte usb_channels[] = {40, 50, 60};
 byte video_channels[] = {70, 75, 80};
 byte rc_channels[] = {1, 3, 5, 7};
 byte full_channels[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100};
+
+void displayGPIOMenu(Adafruit_SH1106G &display, byte menuIndex) {
+  display.clearDisplay();
+  
+  auto centerText = [](const char* text, int textSize) {
+    return (128 - strlen(text) * (textSize == 2 ? 12 : 6)) / 2;
+  };
+
+  byte next = (menuIndex + 1) % GPIO_MENU_ITEM_COUNT;
+  byte prev = (menuIndex + GPIO_MENU_ITEM_COUNT - 1) % GPIO_MENU_ITEM_COUNT;
+
+  display.setTextSize(2);
+  display.setCursor(centerText(gpioMenuItems[menuIndex], 2), 25);
+  display.print(gpioMenuItems[menuIndex]);
+  
+  display.setTextSize(1);
+  display.setCursor(centerText(gpioMenuItems[next], 1), 50);
+  display.print(gpioMenuItems[next]);
+  display.setCursor(centerText(gpioMenuItems[prev], 1), 7);
+  display.print(gpioMenuItems[prev]);
+  
+  display.setCursor(2, 30);
+  display.print(">");
+  display.setCursor(120, 30);
+  display.print("<");
+  
+  display.display();
+}
 
 void saveNRF24Config() {
   if (!SD.begin(SD_CLK)) {

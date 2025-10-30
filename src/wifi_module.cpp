@@ -1,20 +1,21 @@
 #define DEAUTHER
+#include <Arduino.h>
 #include <Adafruit_SH110X.h>
 #include <GyverButton.h>
-#include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <SD.h>
 #include "CONFIG.h"
-#include "wifi_menu.h"
+#include "wifi_module.h"
+#include <WiFi.h>
 #include "deauth.h"
 #include "evilportal.h"
+#include "display.h"
 
 extern Adafruit_SH1106G display;
 extern GButton buttonUp, buttonDown, buttonOK, buttonBack;
 extern bool inMenu;
 extern byte currentMenu, wifiMenuIndex;
-extern void OLED_printMenu(Adafruit_SH1106G &display, byte menuIndex);
 
 #define MAX_FILES 50
 String portalList[MAX_FILES];
@@ -47,6 +48,36 @@ uint8_t channelIndex = 0, wifi_channel = 1;
 uint32_t packetCounter = 0;
 char emptySSID[32];
 uint8_t macAddr[6];
+
+
+
+void displayWiFiMenu(Adafruit_SH1106G &display, byte menuIndex) {
+  display.clearDisplay();
+  
+  auto centerText = [](const char* text, int textSize) {
+    return (128 - strlen(text) * (textSize == 2 ? 12 : 6)) / 2;
+  };
+
+  byte next = (menuIndex + 1) % WIFI_MENU_ITEM_COUNT;
+  byte prev = (menuIndex + WIFI_MENU_ITEM_COUNT - 1) % WIFI_MENU_ITEM_COUNT;
+
+  display.setTextSize(2);
+  display.setCursor(centerText(wifiMenuItems[menuIndex], 2), 25);
+  display.print(wifiMenuItems[menuIndex]);
+  
+  display.setTextSize(1);
+  display.setCursor(centerText(wifiMenuItems[next], 1), 50);
+  display.print(wifiMenuItems[next]);
+  display.setCursor(centerText(wifiMenuItems[prev], 1), 7);
+  display.print(wifiMenuItems[prev]);
+  
+  display.setCursor(2, 30);
+  display.print(">");
+  display.setCursor(120, 30);
+  display.print("<");
+  
+  display.display();
+}
 
 const char funnyssids[] PROGMEM = {
   "Mom Use This One\n"

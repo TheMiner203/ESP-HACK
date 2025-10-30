@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
 #include <GyverButton.h>
@@ -6,10 +7,11 @@
 #include "CONFIG.h"
 #include "interface.h"
 #include "subghz.h"
-#include "wifi_menu.h"
-#include "bluetooth_menu.h"
-#include "infrared_menu.h"
-#include "gpio_menu.h"
+#include "bluetooth.h"
+#include "infrared.h"
+#include "gpio.h"
+#include "display.h"
+#include "wifi_module.h"
 
 // Function prototypes
 void handleWiFiSubmenu();

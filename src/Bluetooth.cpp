@@ -1,14 +1,16 @@
+#include <Arduino.h>
 #include <Adafruit_SH110X.h>
 #include <GyverButton.h>
 #include "CONFIG.h"
-#include "bluetooth_menu.h"
+#include "bluetooth.h"
 #include "ble_spam.h"
-#include "subghz_menu.h"
 #include <SD.h>
 #include <NimBLEDevice.h>
 #include <NimBLEHIDDevice.h>
 #include <NimBLEServer.h>
 #include <NimBLEAdvertising.h>
+#include "interface.h"
+#include "display.h"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -54,6 +56,34 @@ NimBLEHIDDevice*      gHid         = nullptr;
 NimBLECharacteristic* gInput       = nullptr;
 NimBLEAdvertising*    gAdv         = nullptr;
 uint16_t              gConnHandle  = 0xFFFF;
+
+void displayBluetoothMenu(Adafruit_SH1106G &display, byte menuIndex) {
+  display.clearDisplay();
+  
+  auto centerText = [](const char* text, int textSize) {
+    return (128 - strlen(text) * (textSize == 2 ? 12 : 6)) / 2;
+  };
+
+  byte next = (menuIndex + 1) % BLUETOOTH_MENU_ITEM_COUNT;
+  byte prev = (menuIndex + BLUETOOTH_MENU_ITEM_COUNT - 1) % BLUETOOTH_MENU_ITEM_COUNT;
+
+  display.setTextSize(2);
+  display.setCursor(centerText(bluetoothMenuItems[menuIndex], 2), 25);
+  display.print(bluetoothMenuItems[menuIndex]);
+  
+  display.setTextSize(1);
+  display.setCursor(centerText(bluetoothMenuItems[next], 1), 50);
+  display.print(bluetoothMenuItems[next]);
+  display.setCursor(centerText(bluetoothMenuItems[prev], 1), 7);
+  display.print(bluetoothMenuItems[prev]);
+  
+  display.setCursor(2, 30);
+  display.print(">");
+  display.setCursor(120, 30);
+  display.print("<");
+  
+  display.display();
+}
 
 // HID helpers
 static inline void _bb_hidSend(const uint8_t rpt[8]) {

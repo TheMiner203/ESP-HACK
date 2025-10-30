@@ -1,9 +1,10 @@
-#include "subghz.h"
-#include "subghz_menu.h"
-#include <Adafruit_SH110X.h>
-#include <SD.h>
+#include <Arduino.h>
 #include <SPI.h>
+#include <SD.h>
+#include <Adafruit_SH110X.h>
 #include <RCSwitch.h>
+#include "subghz.h"
+#include "interface.h"
 
 void OLED_printCC1101InitFailed();
 
@@ -74,30 +75,35 @@ struct BruceConfigPins {
   } CC1101_bus;
 } bruceConfigPins;
 
-void setupCC1101();
-void configureCC1101();
-void restoreReceiveMode();
-void read_rcswitch(tpKeyData* kd);
-void read_raw(tpKeyData* kd);
-void OLED_printWaitingSignal();
-void OLED_printKey(tpKeyData* kd, String fileName = "", bool isSending = false);
-void OLED_printError(String st, bool err = true);
-bool saveKeyToSD(tpKeyData* kd);
-bool loadKeyFromSD(String fileName, tpKeyData* kd);
-void sendSynthKey(tpKeyData* kd);
-void RCSwitch_send(uint64_t data, unsigned int bits, int pulse, int protocol, int repeat);
-void RCSwitch_RAW_send(int *ptrtransmittimings);
-void myDelayMcs(unsigned long dl);
-void OLED_printAnalyzer(bool signalReceived = false, float detectedFreq = 0.0);
-void OLED_printJammer();
-void OLED_printFileExplorer();
-void OLED_printDeleteConfirm();
-void startJamming();
-void stopJamming();
-String getTypeName(emKeys tp);
-void loadFileList();
-bool initRfModule(String mode, float freq);
-void deinitRfModule();
+void OLED_printSubGHzMenu(Adafruit_SH1106G &display, byte menuIndex) {
+  display.clearDisplay();
+  display.setTextColor(1);
+  display.setTextWrap(false);
+  
+  auto centerText = [](const char* text, int textSize) {
+    return (128 - strlen(text) * (textSize == 2 ? 12 : 6)) / 2;
+  };
+
+  byte next = (menuIndex + 1) % SUBGHZ_MENU_ITEM_COUNT;
+  byte prev = (menuIndex + SUBGHZ_MENU_ITEM_COUNT - 1) % SUBGHZ_MENU_ITEM_COUNT;
+
+  display.setTextSize(2);
+  display.setCursor(centerText(subghzMenuItems[menuIndex], 2), 25);
+  display.print(subghzMenuItems[menuIndex]);
+  
+  display.setTextSize(1);
+  display.setCursor(centerText(subghzMenuItems[next], 1), 50);
+  display.print(subghzMenuItems[next]);
+  display.setCursor(centerText(subghzMenuItems[prev], 1), 7);
+  display.print(subghzMenuItems[prev]);
+  
+  display.setCursor(2, 30);
+  display.print(">");
+  display.setCursor(120, 30);
+  display.print("<");
+  
+  display.display();
+}
 
 bool initRfModule(String mode, float freq) {
   ELECHOUSE_cc1101.setSpiPin(CC1101_SCK, CC1101_MISO, CC1101_MOSI, CC1101_CS);
@@ -824,7 +830,6 @@ void OLED_printFileExplorer() {
 
   display.display();
 }
-
 
 void sendSynthKey(tpKeyData* kd) {
   Serial.println(F("Starting transmission"));

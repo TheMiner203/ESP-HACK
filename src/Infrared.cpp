@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
 #include <GyverButton.h>
@@ -7,8 +8,9 @@
 #include <IRutils.h>
 #include <SD.h>
 #include "CONFIG.h"
-#include "infrared_menu.h"
-#include "subghz_menu.h"
+#include "infrared.h"
+#include "interface.h"
+#include "display.h"
 
 extern Adafruit_SH1106G display;
 extern GButton buttonUp;
@@ -92,6 +94,34 @@ void initIR() {
   irsend.begin();
   pinMode(IR_RECIVER, INPUT);
   Serial.println(F("IR initialized: TX on pin 4, RX on pin 14"));
+}
+
+void displayIRMenu(Adafruit_SH1106G &display, byte menuIndex){
+  display.clearDisplay();
+  
+  auto centerText = [](const char* text, int textSize) {
+    return (128 - strlen(text) * (textSize == 2 ? 12 : 6)) / 2;
+  };
+
+  byte next = (menuIndex + 1) % IR_MENU_ITEM_COUNT;
+  byte prev = (menuIndex + IR_MENU_ITEM_COUNT - 1) % IR_MENU_ITEM_COUNT;
+
+  display.setTextSize(2);
+  display.setCursor(centerText(irMenuItems[menuIndex], 2), 25);
+  display.print(irMenuItems[menuIndex]);
+  
+  display.setTextSize(1);
+  display.setCursor(centerText(irMenuItems[next], 1), 50);
+  display.print(irMenuItems[next]);
+  display.setCursor(centerText(irMenuItems[prev], 1), 7);
+  display.print(irMenuItems[prev]);
+  
+  display.setCursor(2, 30);
+  display.print(">");
+  display.setCursor(120, 30);
+  display.print("<");
+  
+  display.display();
 }
 
 // Function to convert uint32 to string for IR file format
