@@ -81,6 +81,7 @@ Thanks Dripside!
 | CC1101 | [TAP](https://aliexpress.ru/item/1005008544032996.html) |
 | Display SH1106 | [TAP](https://aliexpress.ru/item/1005004464878029.html) |
 | SD-Мodule | [TAP](https://aliexpress.ru/item/32674518514.html) |
+| Buttons | [TAP](https://aliexpress.ru/item/4000452176168.html) |
 | IR-TX, IR-RX | [TAP](https://aliexpress.ru/item/1005007446501425.html) |
 
 ---
