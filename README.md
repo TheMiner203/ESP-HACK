@@ -36,7 +36,7 @@ IOS, Android, Windows
 ### SubGHz
 
 - SubRead  
-- ~~SubSend~~ *(problems due to IDE)*  
+- ~~SubSend~~ *(problems with IDE)*  
 - Analyzer  
 - Jammer (ILLIGAL)
 
