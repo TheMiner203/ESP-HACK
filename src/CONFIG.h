@@ -10,10 +10,10 @@
 #define OLED_SDA 21
 
 // Buttons
-#define BUTTON_UP 27    // K1 - Up
-#define BUTTON_DOWN 26  // K2 - Down
-#define BUTTON_OK 33    // K3 - OK
-#define BUTTON_BACK 32  // K4 - Back
+#define BUTTON_UP 27    // Up
+#define BUTTON_DOWN 26  // Down
+#define BUTTON_OK 33    // OK
+#define BUTTON_BACK 32  // Back
 
 // SD-Card
 #define SD_MOSI 15
