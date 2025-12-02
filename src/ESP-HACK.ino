@@ -11,54 +11,110 @@
 #include "infrared_menu.h"
 #include "gpio_menu.h"
 
-// Function prototypes
 void handleWiFiSubmenu();
 void handleBluetoothSubmenu();
 void handleIRSubmenu();
 void handleGPIOSubmenu();
 
-// Global display and button objects
 Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 GButton buttonUp(BUTTON_UP, HIGH_PULL, NORM_OPEN);
 GButton buttonDown(BUTTON_DOWN, HIGH_PULL, NORM_OPEN);
 GButton buttonOK(BUTTON_OK, HIGH_PULL, NORM_OPEN);
 GButton buttonBack(BUTTON_BACK, HIGH_PULL, NORM_OPEN);
 
-// Custom SPI instance for SD card
-SPIClass sdSPI(HSPI); // Use HSPI for SD card
+SPIClass sdSPI(HSPI);
 
-// Menu state
 #define MENU_ITEM_COUNT 5
 const char* menuItems[] = {"WiFi", "Bluetooth", "SubGHz", "Infrared", "GPIO"};
 byte currentMenu = 0;
 bool inMenu = true;
 
-// WiFi submenu state
 byte wifiMenuIndex = 0;
-
-// Bluetooth submenu state
 byte bluetoothMenuIndex = 0;
 bool inBadBLE = false;
 byte badBLEScriptIndex = 0;
 bool scriptSelected = false;
 byte selectedScript = 0;
 
-// Infrared submenu state
 byte irMenuIndex = 0;
 bool inIRSelection = false;
 bool inIRAttack = false;
 
-// GPIO submenu state
-byte gpioMenuIndex = 0; // Declared globally
+byte gpioMenuIndex = 0;
 
-void setup() {
-  // Initialize Serial for debugging
-  Serial.begin(115200);
-  while (!Serial) {
-    delay(10); // Wait for Serial to initialize
+// Режим ожидания 
+unsigned long lastActivityTime = 0;
+const unsigned long STANDBY_TIMEOUT = 30000; // 30сек
+bool inStandby = false;
+
+int dvd_x = 0;
+int dvd_y = 0;
+int dvd_dx = 1;
+int dvd_dy = 1;
+const int DVD_SPEED = 2;
+const int DVD_LOGO_WIDTH = 32;
+const int DVD_LOGO_HEIGHT = 24;
+
+void resetActivityTimer() {
+  lastActivityTime = millis();
+  if (inStandby) {
+    inStandby = false;
+    if (inMenu) {
+      OLED_printMenu(display, currentMenu);
+    }
+  }
+}
+
+void enterStandby() {
+  inStandby = true;
+  dvd_x = random(0, display.width() - DVD_LOGO_WIDTH + 1);
+  dvd_y = random(0, display.height() - DVD_LOGO_HEIGHT + 1);
+  dvd_dx = 1;
+  dvd_dy = 1;
+}
+
+void drawStandbyAnimation() {
+  display.clearDisplay();
+  display.drawBitmap(dvd_x, dvd_y, bitmap_dvd_logo, DVD_LOGO_WIDTH, DVD_LOGO_HEIGHT, SH110X_WHITE);
+
+  dvd_x += dvd_dx * DVD_SPEED;
+  dvd_y += dvd_dy * DVD_SPEED;
+
+  if (dvd_x <= 0 || dvd_x + DVD_LOGO_WIDTH >= display.width()) {
+    dvd_dx = -dvd_dx;
+    dvd_x = (dvd_x <= 0) ? 0 : display.width() - DVD_LOGO_WIDTH;
+  }
+  if (dvd_y <= 0 || dvd_y + DVD_LOGO_HEIGHT >= display.height()) {
+    dvd_dy = -dvd_dy;
+    dvd_y = (dvd_y <= 0) ? 0 : display.height() - DVD_LOGO_HEIGHT;
   }
 
-  // Initialize buttons
+  display.display();
+}
+
+bool manageStandby(bool anyClick) {
+  if (inStandby) {
+    if (anyClick) {
+      resetActivityTimer();
+      return true;
+    } else {
+      drawStandbyAnimation();
+      return true;
+    }
+  } else {
+    if (millis() - lastActivityTime >= STANDBY_TIMEOUT) {
+      enterStandby();
+      drawStandbyAnimation();
+      return true;
+    }
+    return false;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial) delay(10);
+
   buttonUp.setDebounce(50);
   buttonUp.setTimeout(500);
   buttonUp.setClickTimeout(300);
@@ -78,23 +134,18 @@ void setup() {
   buttonUp.setTickMode(AUTO);
   buttonDown.setTickMode(AUTO);
 
-  // Initialize I2C with specified pins
   Wire.begin(OLED_SDA, OLED_SCL);
   
-  // Initialize display
   if (!display.begin(OLED_ADR)) {
     Serial.println(F("SH110X allocation failed"));
-    for(;;); // Don't proceed, loop forever if display init fails
+    for(;;);
   }
 
-  // Initialize SD card
   Serial.println(F("Initializing SD card..."));
-  sdSPI.begin(SD_CLK, SD_MISO, SD_MOSI); // Initialize custom SPI (CLK: 2, MISO: 0, MOSI: 15)
-  sdSPI.setFrequency(4000000); // Set SPI clock to 4 MHz for compatibility
-  if (!SD.begin(-1, sdSPI)) { // Pass -1 for CS (ignored, as CS is tied to GND)
-    Serial.println(F("SD card initialization failed! Check the following:"));
-    Serial.println(F("- Is the SD card inserted properly?"));
-    Serial.println(F("- Is the SD card formatted as FAT32?"));
+  sdSPI.begin(SD_CLK, SD_MISO, SD_MOSI);
+  sdSPI.setFrequency(4000000);
+  if (!SD.begin(-1, sdSPI)) {
+    Serial.println(F("SD card initialization failed!"));
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SH110X_WHITE);
@@ -103,60 +154,20 @@ void setup() {
     display.println(F(""));
     display.println(F("ERROR: 0x000"));
     display.display();
-    for(;;); // Don't proceed, loop forever if SD init fails
+    for(;;);
   }
   Serial.println(F("SD card initialized successfully"));
 
-  // Check SD card details
-  uint8_t cardType = SD.cardType();
-  if (cardType == CARD_NONE) {
-    Serial.println(F("No SD card detected"));
-  } else if (cardType == CARD_MMC) {
-    Serial.println(F("Card type: MMC"));
-  } else if (cardType == CARD_SD) {
-    Serial.println(F("Card type: SDSC"));
-  } else if (cardType == CARD_SDHC) {
-    Serial.println(F("Card type: SDHC"));
-  }
-  uint64_t cardSize = SD.cardSize() / (1024 * 1024); // Size in MB
-  Serial.print(F("SD Card Size: "));
-  Serial.print(cardSize);
-  Serial.println(F("MB"));
+  if (!SD.exists("/WiFi")) SD.mkdir("/WiFi");
+  if (!SD.exists("/WiFi/Wardriving")) SD.mkdir("/WiFi/Wardriving");
+  if (!SD.exists("/WiFi/Portals")) SD.mkdir("/WiFi/Portals");
+  if (!SD.exists("/BadKB")) SD.mkdir("/BadKB");
+  if (!SD.exists("/SubGHz")) SD.mkdir("/SubGHz");
+  if (!SD.exists("/Infrared")) SD.mkdir("/Infrared");
+  if (!SD.exists("/GPIO")) SD.mkdir("/GPIO");
 
-  // Create necessary directories
-  if (!SD.exists("/WiFi")) {
-    SD.mkdir("/WiFi");
-    Serial.println(F("Created WiFi directory"));
-  }
-  if (!SD.exists("/WiFi/Wardriving")) {
-    SD.mkdir("/WiFi/Wardriving");
-    Serial.println(F("Created Wardriving directory"));
-  }
-  if (!SD.exists("/WiFi/Portals")) {
-    SD.mkdir("/WiFi/Portals");
-    Serial.println(F("Created Wardriving directory"));
-  }
-  if (!SD.exists("/BadKB")) {
-    SD.mkdir("/BadKB");
-    Serial.println(F("Created BadKB directory"));
-  }
-  if (!SD.exists("/SubGHz")) {
-    SD.mkdir("/SubGHz");
-    Serial.println(F("Created SubGHz directory"));
-  }
-  if (!SD.exists("/Infrared")) {
-    SD.mkdir("/Infrared");
-    Serial.println(F("Created Infrared directory"));
-  }
-  if (!SD.exists("/GPIO")) {
-    SD.mkdir("/GPIO");
-    Serial.println(F("Created GPIO directory"));
-  }
-
-  // Show splash screen
   OLED_printLogo(display);
 
-  // Wait for any button press to proceed
   while (!buttonUp.isClick() && !buttonDown.isClick() && !buttonOK.isClick() && !buttonBack.isClick()) {
     buttonUp.tick();
     buttonDown.tick();
@@ -164,82 +175,70 @@ void setup() {
     buttonBack.tick();
   }
 
-  // Enter main menu
   OLED_printMenu(display, currentMenu);
+  lastActivityTime = millis();
 }
 
 void loop() {
-  // Update buttons
   buttonUp.tick();
   buttonDown.tick();
   buttonOK.tick();
   buttonBack.tick();
 
+  bool upClick = buttonUp.isClick();
+  bool downClick = buttonDown.isClick();
+  bool okClick = buttonOK.isClick();
+  bool backClick = buttonBack.isClick();
+
+  bool anyClick = upClick || downClick || okClick || backClick;
+
+  if (anyClick && !inStandby) {
+    resetActivityTimer();
+  }
+
+  if (manageStandby(anyClick)) return;
+
   if (inMenu) {
-    // Navigate main menu
-    if (buttonUp.isClick()) {
+    if (upClick) {
       currentMenu = (currentMenu - 1 + MENU_ITEM_COUNT) % MENU_ITEM_COUNT;
       OLED_printMenu(display, currentMenu);
-      Serial.println(F("Main menu Up"));
     }
-    if (buttonDown.isClick()) {
+    if (downClick) {
       currentMenu = (currentMenu + 1) % MENU_ITEM_COUNT;
       OLED_printMenu(display, currentMenu);
-      Serial.println(F("Main menu Down"));
     }
-    if (buttonOK.isClick()) {
-      Serial.println(F("Main menu OK"));
-      inMenu = false; // Exit main menu
+    if (okClick) {
+      inMenu = false;
       if (currentMenu == 0) {
-        // Enter WiFi submenu (Index 0)
         wifiMenuIndex = 0;
         displayWiFiMenu(display, wifiMenuIndex);
-        Serial.println(F("Entered WiFi submenu"));
       } else if (currentMenu == 1) {
-        // Enter Bluetooth submenu (Index 1)
         bluetoothMenuIndex = 0;
         displayBluetoothMenu(display, bluetoothMenuIndex);
-        Serial.println(F("Entered Bluetooth submenu"));
       } else if (currentMenu == 2) {
-        // Enter SubGHz submenu (Index 2)
-        Serial.println(F("Entering SubGHz menu"));
         runSubGHz();
-        // After SubGHz returns, restore main menu
         inMenu = true;
         OLED_printMenu(display, currentMenu);
       } else if (currentMenu == 3) {
-        // Enter Infrared submenu (Index 3)
         irMenuIndex = 0;
         displayIRMenu(display, irMenuIndex);
-        Serial.println(F("Entered Infrared submenu"));
       } else if (currentMenu == 4) {
-        // Enter GPIO submenu (Index 4)
         gpioMenuIndex = 0;
         displayGPIOMenu(display, gpioMenuIndex);
-        Serial.println(F("Entered GPIO submenu"));
       }
     }
   } else {
-    // Handle submenus
-    if (currentMenu == 0) {
-      // Handle WiFi submenu
+    if (backClick) {
+      inMenu = true;
+      OLED_printMenu(display, currentMenu);
+    } else if (currentMenu == 0) {
       handleWiFiSubmenu();
     } else if (currentMenu == 1) {
-      // Handle Bluetooth submenu
       handleBluetoothSubmenu();
     } else if (currentMenu == 3) {
-      // Handle Infrared submenu
       handleIRSubmenu();
     } else if (currentMenu == 4) {
-      // Handle GPIO submenu
       handleGPIOSubmenu();
-    } else {
-      // Handle other submenus (SubGHz)
-      if (buttonBack.isClick()) {
-        inMenu = true;
-        OLED_printMenu(display, currentMenu);
-        Serial.println(F("Back to main menu from other submenu"));
-      }
     }
   }
 }
